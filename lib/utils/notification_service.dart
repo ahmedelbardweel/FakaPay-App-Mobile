@@ -36,9 +36,8 @@ class NotificationService {
 
     // Request permissions for iOS
     if (Platform.isIOS) {
-      await _notificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              DarwinFlutterLocalNotificationsPlugin>()
+      await (_notificationsPlugin as dynamic)
+          .resolvePlatformSpecificImplementation()
           ?.requestPermissions(
             alert: true,
             badge: true,
