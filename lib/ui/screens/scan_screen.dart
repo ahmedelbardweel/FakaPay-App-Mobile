@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:ui';
 import '../theme.dart';
 import '../../providers/wallet_provider.dart';
 import '../../data/api/api_service.dart';
@@ -236,125 +237,185 @@ class _ScanScreenState extends State<ScanScreen> {
         bool isProcessingLocal = false;
 
         return StatefulBuilder(builder: (context, setDialogState) {
-          return AlertDialog(
-            backgroundColor: AppTheme.white,
-            surfaceTintColor: Colors.transparent,
-            shape:
-                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            insetPadding: const EdgeInsets.symmetric(horizontal: 10),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  S.of(context, 'enter_amount'),
-                  style: GoogleFonts.cairo(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: AppTheme.black,
-                      letterSpacing: -0.5),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  S.of(context, 'how_much_to_send'),
-                  style: GoogleFonts.cairo(
-                      fontSize: 14,
-                      color: AppTheme.gray500,
-                      fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: amountController,
-                  cursorWidth: 250,
-                  style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.black,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '0.00',
-                    prefixIcon: const Icon(
-                        Icons.account_balance_wallet_outlined,
-                        size: 20),
-                    suffixText: S.of(context, 'amount_ils').trim(),
-                    suffixStyle: GoogleFonts.cairo(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.gray500,
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: AppTheme.primaryYellow.withOpacity(0.2),
+                      width: 1.5,
                     ),
                   ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  autofocus: true,
-                  enabled: !isProcessingLocal,
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed:
-                          isProcessingLocal ? null : () => Navigator.pop(ctx),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryYellow.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  S.of(context, 'enter_amount'),
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppTheme.black,
+                                  ),
+                                ),
+                                Text(
+                                  S.of(context, 'how_much_to_send'),
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 12,
+                                    color: AppTheme.gray500,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        S.of(context, 'cancel'),
+                      const SizedBox(height: 24),
+                      TextField(
+                        controller: amountController,
                         style: GoogleFonts.cairo(
-                          fontSize: 14,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
                           color: AppTheme.black,
-                          fontWeight: FontWeight.bold,
                         ),
+                        decoration: InputDecoration(
+                          hintText: '0.00',
+                          prefixText: S.of(context, 'amount_ils').trim() + ' ',
+                          prefixStyle: GoogleFonts.cairo(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryYellow,
+                          ),
+                          filled: true,
+                          fillColor: AppTheme.primaryYellow.withOpacity(0.05),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                                color: AppTheme.primaryYellow, width: 2),
+                          ),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        autofocus: true,
+                        enabled: !isProcessingLocal,
                       ),
-                    ),
-                    TextButton(
-                      onPressed: isProcessingLocal
-                          ? null
-                          : () async {
-                              final amt =
-                                  double.tryParse(amountController.text);
-                              if (amt != null && amt > 0) {
-                                setDialogState(() => isProcessingLocal = true);
-                                final String? successMessage =
-                                    await _processTokenInternal(token, amt);
-                                if (successMessage != null && mounted) {
-                                  Navigator.pop(ctx);
-                                  _onSuccess(successMessage);
-                                } else {
-                                  setDialogState(
-                                      () => isProcessingLocal = false);
-                                }
-                              }
-                            },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: isProcessingLocal
-                          ? const SizedBox(
-                              height: 16,
-                              width: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppTheme.black,
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: isProcessingLocal
+                                  ? null
+                                  : () => Navigator.pop(ctx),
+                              style: TextButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
-                            )
-                          : Text(
-                              S.of(context, 'confirm'),
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                color: AppTheme.black,
-                                fontWeight: FontWeight.bold,
+                              child: Text(
+                                S.of(context, 'cancel'),
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14,
+                                  color: AppTheme.gray500,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                    ),
-                  ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: isProcessingLocal
+                                  ? null
+                                  : () async {
+                                      final amt = double.tryParse(
+                                          amountController.text);
+                                      if (amt != null && amt > 0) {
+                                        setDialogState(
+                                            () => isProcessingLocal = true);
+                                        final String? successMessage =
+                                            await _processTokenInternal(
+                                                token, amt);
+                                        if (successMessage != null && mounted) {
+                                          Navigator.pop(ctx);
+                                          _onSuccess(successMessage);
+                                        } else {
+                                          setDialogState(
+                                              () => isProcessingLocal = false);
+                                        }
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryYellow,
+                                foregroundColor: AppTheme.white,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: isProcessingLocal
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppTheme.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      S.of(context, 'confirm'),
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 14,
+                                        color: AppTheme.white,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           );
         });
