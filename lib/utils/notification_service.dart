@@ -36,13 +36,14 @@ class NotificationService {
 
     // Request permissions for iOS
     if (Platform.isIOS) {
-      await (_notificationsPlugin as dynamic)
-          .resolvePlatformSpecificImplementation()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+      final iosImplementation = _notificationsPlugin.resolvePlatformSpecificImplementation();
+      if (iosImplementation != null) {
+        await (iosImplementation as dynamic).requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
     }
   }
 

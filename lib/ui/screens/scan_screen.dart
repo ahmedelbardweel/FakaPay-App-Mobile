@@ -293,11 +293,11 @@ class _ScanScreenState extends State<ScanScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 10),
                       TextField(
                         controller: amountController,
                         style: GoogleFonts.cairo(
-                          fontSize: 24,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: AppTheme.black,
                         ),
@@ -305,16 +305,16 @@ class _ScanScreenState extends State<ScanScreen> {
                           hintText: '0.00',
                           prefixText: S.of(context, 'amount_ils').trim() + ' ',
                           prefixStyle: GoogleFonts.cairo(
-                            fontSize: 18,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.primaryYellow,
                           ),
                           filled: true,
                           fillColor: AppTheme.primaryYellow.withOpacity(0.05),
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
+                              horizontal: 10, vertical: 5),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(1),
                             borderSide: BorderSide.none,
                           ),
                           enabledBorder: OutlineInputBorder(
