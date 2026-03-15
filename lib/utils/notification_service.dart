@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -26,10 +27,24 @@ class NotificationService {
 
   Future<void> requestPermission() async {
     // Request permissions for Android 13+
-    await _notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    if (Platform.isAndroid) {
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    }
+
+    // Request permissions for iOS
+    if (Platform.isIOS) {
+      await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              DarwinFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
   }
 
   Future<void> showPaymentNotification({
